@@ -226,7 +226,7 @@ import axios from 'axios';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import ReactLoading from 'react-loading';
 
-const API_URL = "http://localhost:5000"; // Base API URL
+const API_URL = "https://hotrodsbackend.onrender.com"; // Base API URL
 
 const AuthorizeDisplay = () => {
   const [authorizations, setAuthorizations] = useState([]);

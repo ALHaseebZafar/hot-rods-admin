@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AiFillEdit, AiFillDelete, AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://hotrodsbackend.onrender.com";
 
 const Services = () => {
   const [services, setServices] = useState([]);

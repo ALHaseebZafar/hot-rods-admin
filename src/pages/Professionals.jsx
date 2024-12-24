@@ -20,7 +20,7 @@ const Professionals = () => {
   const [isImageUploading, setIsImageUploading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const professionalPerPage = 7;
-  const API_URL = "http://localhost:5000";
+  const API_URL = "https://hotrodsbackend.onrender.com";
 
   useEffect(() => {
     fetchProfessionals();

@@ -5,7 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ReactLoading from "react-loading";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://hotrodsbackend.onrender.com";
 
 const ShopTimings = () => {
   const defaultTimings = {

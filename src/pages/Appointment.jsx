@@ -10,7 +10,7 @@ export const Appointment = () => {
   const [updateData, setUpdateData] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const API_URL = "http://localhost:5000"; // Adjust as needed
+  const API_URL = "https://hotrodsbackend.onrender.com"; // Adjust as needed
 
   // Fetch appointments from API
   useEffect(() => {

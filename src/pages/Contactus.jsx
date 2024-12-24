@@ -11,7 +11,7 @@ const ContactUs = () => {
   const itemsPerPage = 7;
 
   // Get the backend URL from environment variables
-  const API_URL = "http://localhost:5000"; 
+  const API_URL = "https://hotrodsbackend.onrender.com"; 
 
   // Fetch contact data from the API when the component mounts
   useEffect(() => {
