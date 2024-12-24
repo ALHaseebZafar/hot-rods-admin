@@ -107,10 +107,10 @@ const ShopTimings = () => {
       <table className="w-full border-collapse border border-gray-300">
         <thead>
           <tr>
-            <th className="p-4 border-b border-gray-300">Day</th>
-            <th className="p-4 border-b border-gray-300">Opening Time</th>
-            <th className="p-4 border-b border-gray-300">Closing Time</th>
-            <th className="p-4 border-b border-gray-300">Actions</th>
+            <th className="p-4 border-b border-gray-300 text-left">Day</th>
+            <th className="p-4 border-b border-gray-300 text-left">Opening Time</th>
+            <th className="p-4 border-b border-gray-300 text-left">Closing Time</th>
+            <th className="p-4 border-b border-gray-300 text-left">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -157,14 +157,16 @@ const ShopTimings = () => {
                   {editingDay === day ? (
                     <button
                       onClick={() => handleUpdate(day)}
-                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                      className="relative font-montserrat inline-flex items-center justify-center rounded-[10px] overflow-hidden tracking-tighter group border border-brown-primary px-4 py-2 bg-white text-brown-primary hover:bg-[#4B2E2E] hover:shadow-lg !shadow-brown-primary hover:text-white hover-styling"
                     >
-                      Save
+                      <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-[#4B2E2E] rounded-full group-hover:w-72 group-hover:h-56"></span>
+                      <span className="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent"></span>
+                      <span className="relative">Save</span>
                     </button>
                   ) : (
                     <button
                       onClick={() => handleEdit(day)}
-                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center space-x-2"
+                      className="relative font-montserrat  items-center justify-center rounded-[10px] overflow-hidden tracking-tighter group border border-brown-primary px-4 py-2 bg-white text-brown-primary hover:bg-[#4B2E2E] hover:shadow-lg !shadow-brown-primary hover:text-white hover-styling flex space-x-2"
                     >
                       <AiFillEdit />
                       <span>Update</span>

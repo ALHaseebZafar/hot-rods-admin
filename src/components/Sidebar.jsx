@@ -8,7 +8,7 @@ function Sidebar() {
     <div className="flex h-screen bg-gray-100">
       {/* Toggle Button for Mobile */}
       <button
-        className="absolute top-4 left-4 z-50 md:hidden px-4 py-2 bg-gray-800 text-white rounded"
+        className="absolute top-4 left-4 z-50 md:hidden px-4 py-2 bg-[#4B2E2E] text-white rounded-lg shadow-md transition-all duration-300 hover:bg-brown-primary"
         onClick={() => setSidebarOpen(!isSidebarOpen)}
       >
         {isSidebarOpen ? 'Close' : 'Menu'}
@@ -16,81 +16,36 @@ function Sidebar() {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 z-40 w-full bg-gray-800 transform ${
+        className={`fixed inset-y-0 z-40 w-full bg-[#4B2E2E] transform ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } transition-transform duration-300 md:translate-x-0 md:relative md:flex md:w-64`}
       >
         <div className="flex flex-col min-w-full h-full">
-          <div className="flex items-center justify-center h-16 bg-gray-900">
-            <span className="text-white font-bold uppercase">ADMIN PANEL</span>
+          <div className="flex items-center justify-center h-16 bg-brown-primary shadow-md">
+            <span className="text-white font-montserrat font-bold uppercase tracking-widest">ADMIN PANEL</span>
           </div>
           <div className="flex flex-col flex-1 overflow-y-auto">
-            <nav className="flex flex-col space-y-2 px-2 py-4 bg-gray-800 w-full">
+            <nav className="flex flex-col space-y-2 px-2 py-4">
               {/* Navigation Links */}
-              <Link
-                to="/professionals"
-                className="w-full hover:bg-gray-700 transition-all duration-300"
-              >
-                <button className="w-full text-gray-100 px-4 py-2 text-left">
-                  Professional
-                </button>
-              </Link>
-
-              <Link
-                to="/inquiry"
-                className="w-full hover:bg-gray-700 transition-all duration-300"
-              >
-                <button className="w-full text-gray-100 px-4 py-2 text-left">
-                  Online/Manual Booking
-                </button>
-              </Link>
-
-              <Link
-                to="/services"
-                className="w-full hover:bg-gray-700 transition-all duration-300"
-              >
-                <button className="w-full text-gray-100 px-4 py-2 text-left">
-                  Services
-                </button>
-              </Link>
-
-              <Link
-                to="/appointments"
-                className="w-full hover:bg-gray-700 transition-all duration-300"
-              >
-                <button className="w-full text-gray-100 px-4 py-2 text-left">
-                  Appointment
-                </button>
-              </Link>
-
-              <Link
-                to="/ordersummary"
-                className="w-full hover:bg-gray-700 transition-all duration-300"
-              >
-                <button className="w-full text-gray-100 px-4 py-2 text-left">
-                  Order Summary
-                </button>
-              </Link>
-
-              <Link
-                to="/contactus"
-                className="w-full hover:bg-gray-700 transition-all duration-300"
-              >
-                <button className="w-full text-gray-100 px-4 py-2 text-left">
-                  ContactUs
-                </button>
-              </Link>
-
-              <Link
-                to="/shoptiming"
-                className="w-full hover:bg-gray-700 transition-all duration-300"
-              >
-                <button className="w-full text-gray-100 px-4 py-2 text-left">
-                  ShopTiming
-                </button>
-              </Link>
-              
-              
+              {[
+                { path: '/professionals', label: 'Professional' },
+                { path: '/inquiry', label: 'Online/Manual Booking' },
+                { path: '/services', label: 'Services' },
+                { path: '/appointments', label: 'Appointment' },
+                { path: '/ordersummary', label: 'Order Summary' },
+                { path: '/contactus', label: 'Contact Us' },
+                { path: '/shoptiming', label: 'Shop Timing' },
+              ].map((link, index) => (
+                <Link
+                  key={index}
+                  to={link.path}
+                  className="w-full hover:bg-[#6A4C4C] transition-all duration-300 rounded-lg"
+                >
+                  <button className="w-full text-gray-100 px-4 py-2 text-left font-montserrat tracking-tight">
+                    {link.label}
+                  </button>
+                </Link>
+              ))}
             </nav>
           </div>
         </div>
