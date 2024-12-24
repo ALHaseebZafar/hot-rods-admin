@@ -320,10 +320,10 @@ const AuthorizeDisplay = () => {
                 <p className="text-gray-600">Subtotal</p>
                 <p className="font-medium">${selectedRecord.subTotal}</p>
               </div>
-              <div>
+              {/* <div>
                 <p className="text-gray-600">Tip</p>
                 <p className="font-medium">${selectedRecord.tip || 0}</p>
-              </div>
+              </div> */}
               <div>
                 <p className="text-gray-600">Grand Total</p>
                 <p className="font-medium">${selectedRecord.grandTotal}</p>
