@@ -328,14 +328,14 @@ const Services = () => {
               <button
                 type="button"
                 onClick={() => setIsAssignModalOpen(false)}
-                className="px-4 py-2 border border-gray-300 rounded"
+                className="relative font-montserrat inline-flex items-center justify-center rounded-[10px] overflow-hidden tracking-tighter group border sm:place-self-center lg:place-self-start border-brown-primary text-[12px] sm:text-[14px] px-4 sm:w-32 md:w-40 h-9 bg-gray-500 text-white hover:bg-gray-600 hover:shadow-lg !shadow-brown-primary hover:text-white hover-styling"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleSaveAssignments}
-                className="px-4 py-2 border border-blue-500 text-blue-500 rounded"
+                className="relative font-montserrat inline-flex items-center justify-center rounded-[10px] overflow-hidden tracking-tighter group border sm:place-self-center lg:place-self-start border-brown-primary text-[12px] sm:text-[14px] px-3 sm:w-32 md:w-40 h-9 bg-white text-brown-primary hover:bg-[#4B2E2E] hover:shadow-lg !shadow-brown-primary hover:text-white hover-styling"
               >
                 Save
               </button>

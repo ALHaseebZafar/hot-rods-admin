@@ -31,7 +31,7 @@ function Sidebar() {
                 { path: '/professionals', label: 'Professional' },
                 { path: '/inquiry', label: 'Online/Manual Booking' },
                 { path: '/services', label: 'Services' },
-                { path: '/appointments', label: 'Appointment' },
+                // { path: '/appointments', label: 'Appointment' },
                 { path: '/ordersummary', label: 'Order Summary' },
                 { path: '/contactus', label: 'Contact Us' },
                 { path: '/shoptiming', label: 'Shop Timing' },
