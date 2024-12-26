@@ -88,20 +88,20 @@ const ContactUs = () => {
                 <td className="px-4 py-2 border-b text-sm text-gray-800">{contact.fullname}</td>
                 <td className="px-4 py-2 border-b text-sm text-gray-800">{contact.email}</td>
                 <td className="px-4 py-2 border-b text-sm text-gray-800">
-                  <button
-                    onClick={() => handleViewQuestion(contact.question)}
-                    className="text-blue-500 hover:text-blue-700"
-                  >
-                    <AiOutlineEye size={20} />
-                  </button>
+                <button
+      onClick={() => handleViewQuestion(contact.question)}
+      className="relative font-montserrat inline-flex items-center justify-center rounded-[10px] overflow-hidden tracking-tighter group border sm:place-self-center lg:place-self-start border-brown-primary text-[12px] sm:text-[14px] px-3 sm:w-32 md:w-40 h-9 bg-white text-brown-primary hover:bg-[#4B2E2E] hover:shadow-lg !shadow-brown-primary hover:text-white hover-styling"
+    >
+      <AiOutlineEye />
+    </button>
                 </td>
                 <td className="px-4 py-2 border-b text-sm">
-                  <button
-                    onClick={() => handleDeleteContact(contact._id)}
-                    className="text-red-500"
-                  >
-                    <AiFillDelete size={20} />
-                  </button>
+                <button
+      onClick={() => handleDeleteContact(contact._id)}
+      className="relative font-montserrat inline-flex items-center justify-center rounded-[10px] overflow-hidden tracking-tighter group border sm:place-self-center lg:place-self-start border-brown-primary text-[12px] sm:text-[14px] px-3 sm:w-32 md:w-40 h-9 bg-white text-brown-primary hover:bg-[#4B2E2E] hover:shadow-lg !shadow-brown-primary hover:text-white hover-styling"
+    >
+      <AiFillDelete />
+    </button>
                 </td>
               </tr>
             ))}
@@ -133,22 +133,22 @@ const ContactUs = () => {
       </div>
 
       {/* Modal to show the question */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-semibold mb-4">Question</h2>
-            <p className="text-gray-800">{currentQuestion}</p>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={handleCloseModal}
-                className="px-4 py-2 bg-gray-300 rounded"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+    {isModalOpen && (
+  <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+      <h2 className="text-xl font-semibold mb-4">Question</h2>
+      <p className="text-gray-800">{currentQuestion}</p>
+      <div className="flex justify-end mt-4">
+        <button
+          onClick={handleCloseModal}
+          className="relative font-montserrat inline-flex items-center justify-center rounded-[10px] overflow-hidden tracking-tighter group border sm:place-self-center lg:place-self-start border-brown-primary text-[14px] sm:text-[16px] px-4 sm:w-60 md:w-72 h-12 bg-white text-brown-primary hover:bg-[#4B2E2E] hover:shadow-lg !shadow-brown-primary hover:text-white hover-styling"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Toast Container for Notifications */}
       <ToastContainer />

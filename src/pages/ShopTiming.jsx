@@ -99,10 +99,12 @@ const ShopTimings = () => {
       <h1 className="text-2xl font-semibold mb-6">Shop Timings</h1>
 
       {isLoading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50">
-          <ReactLoading type="spin" color="#ffffff" height={50} width={50} />
+      <div className="relative flex flex-col w-full h-full text-gray-700 bg-white shadow-md rounded-lg bg-clip-border overflow-hidden">
+        <div className="flex justify-center items-center h-48">
+          <ReactLoading type="spin" color="#4B2E2E" />
         </div>
-      )}
+      </div>
+    )}
 
       <table className="w-full border-collapse border border-gray-300">
         <thead>
@@ -166,10 +168,10 @@ const ShopTimings = () => {
                   ) : (
                     <button
                       onClick={() => handleEdit(day)}
-                      className="relative font-montserrat  items-center justify-center rounded-[10px] overflow-hidden tracking-tighter group border border-brown-primary px-4 py-2 bg-white text-brown-primary hover:bg-[#4B2E2E] hover:shadow-lg !shadow-brown-primary hover:text-white hover-styling flex space-x-2"
-                    >
+                      className="relative font-montserrat inline-flex items-center justify-center rounded-[10px] overflow-hidden tracking-tighter group border sm:place-self-center lg:place-self-start border-brown-primary text-[12px] sm:text-[14px] px-3 sm:w-32 md:w-40 h-9 bg-white text-brown-primary hover:bg-[#4B2E2E] hover:shadow-lg !shadow-brown-primary hover:text-white hover-styling"
+                      >
                       <AiFillEdit />
-                      <span>Update</span>
+                      {/* <span>Update</span> */}
                     </button>
                   )}
                 </td>

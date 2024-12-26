@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
+import ReactLoading from "react-loading";
 import 'react-toastify/dist/ReactToastify.css';
 
 const API_URL = "https://hotrodsbackend.onrender.com";
@@ -135,7 +136,11 @@ const Inquire = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   if (loading && !isFormVisible) {
-    return <div className="p-4">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-48">
+        <ReactLoading type="spin" color="#000" />
+      </div>
+    );
   }
 
   return (
@@ -210,7 +215,20 @@ const Inquire = () => {
               disabled={loading}
               className="relative font-montserrat inline-flex items-center justify-center rounded-[10px] overflow-hidden tracking-tighter group border sm:place-self-center lg:place-self-start border-brown-primary text-[14px] sm:text-[16px] px-4 sm:w-60 md:w-72 h-12 bg-white text-brown-primary hover:bg-[#4B2E2E] hover:shadow-lg !shadow-brown-primary hover:text-white hover-styling"
             >
-              {loading ? 'Submitting...' : (editingInquiryId ? 'Update' : 'Submit')}
+              {loading ? (
+                <span className="flex items-center">
+                  Loading...
+                  <ReactLoading
+                    type="spin"
+                    color="#fff"
+                    width={20}
+                    height={20}
+                    className="ml-2"
+                  />
+                </span>
+              ) : (
+                editingInquiryId ? 'Update' : 'Submit'
+              )}
             </button>
             <button
               type="button"
@@ -301,7 +319,7 @@ const Inquire = () => {
               >
                 <AiOutlineRight className="w-5 h-5" />
               </button>
-            </div>
+              </div>
           )}
         </div>
       )}

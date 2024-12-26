@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { AiFillEdit, AiFillDelete, AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
+import { toast, ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import ReactLoading from "react-loading";
 
 const API_URL = "https://hotrodsbackend.onrender.com";
 
@@ -12,6 +15,7 @@ const Services = () => {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedProfessionals, setSelectedProfessionals] = useState([]);
   const [currentServiceId, setCurrentServiceId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // Loading state
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,26 +23,33 @@ const Services = () => {
 
   // Fetch services and professionals on component mount
   useEffect(() => {
-    // Fetch services
-    fetch(`${API_URL}/service`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.services) {
-          setServices(data.services);
-        }
-      })
-      .catch((err) => console.error("Error fetching services:", err));
-
-    // Fetch professionals
-    fetch(`${API_URL}/professional`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.professionals) {
-          setProfessionalsList(data.professionals);
-        }
-      })
-      .catch((err) => console.error("Error fetching professionals:", err));
+    fetchServices();
+    fetchProfessionals();
   }, []);
+
+  const fetchServices = async () => {
+    try {
+      const response = await fetch(`${API_URL}/service`);
+      const data = await response.json();
+      if (data.services) {
+        setServices(data.services);
+      }
+    } catch (err) {
+      console.error("Error fetching services:", err);
+    }
+  };
+
+  const fetchProfessionals = async () => {
+    try {
+      const response = await fetch(`${API_URL}/professional`);
+      const data = await response.json();
+      if (data.professionals) {
+        setProfessionalsList(data.professionals);
+      }
+    } catch (err) {
+      console.error("Error fetching professionals:", err);
+    }
+  };
 
   // Add input validation
   const validateServiceInput = (data) => {
@@ -50,99 +61,115 @@ const Services = () => {
   };
 
   // Add service
-  const handleAddService = (e) => {
+  const handleAddService = async (e) => {
     e.preventDefault();
 
     // Validate input before submitting
     if (!validateServiceInput(formData)) return;
 
-    fetch(`${API_URL}/service`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to add service');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data.service) {
-          // Add the new service to the list
-          const updatedServices = [...services, data.service];
-          setServices(updatedServices);
+    setIsLoading(true); // Start loading
 
-          // Reset form data
-          setFormData({ title: '', time: '', price: '' });
-
-          // Close the modal
-          setIsUpdateModalOpen(false);
-
-          // Reset to first page after adding service
-          setCurrentPage(1);
-        }
-      })
-      .catch((err) => {
-        console.error("Error adding service:", err);
-        alert('Failed to add service. Please try again.');
+    try {
+      const response = await fetch(`${API_URL}/service`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to add service');
+      }
+
+      const data = await response.json();
+      if (data.service) {
+        // Add the new service to the list
+        const updatedServices = [...services, data.service];
+        setServices(updatedServices);
+
+        // Reset form data
+        setFormData({ title: '', time: '', price: '' });
+
+        // Close the modal
+        setIsUpdateModalOpen(false);
+
+        // Reset to first page after adding service
+        setCurrentPage(1);
+      }
+    } catch (err) {
+      console.error("Error adding service:", err);
+      alert('Failed to add service. Please try again.');
+    } finally {
+      setIsLoading(false); // Stop loading
+    }
   };
 
   // Update service
-  const handleUpdateService = (e) => {
+  const handleUpdateService = async (e) => {
     e.preventDefault();
 
     // Validate input before submitting
     if (!validateServiceInput(updateData)) return;
 
-    const updatedFields = {
-      title: updateData.title || "",
-      time: updateData.time || "",
-      price: updateData.price || "",
-    };
+    setIsLoading(true); // Start loading
 
-    fetch(`${API_URL}/service/${updateData._id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedFields),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.service) {
-          setServices(
-            services.map((service) =>
-              service._id === data.service._id ? data.service : service
-            )
-          );
-        }
-        setIsUpdateModalOpen(false);
-      })
-      .catch((err) => console.error("Error updating service:", err));
+    try {
+      const updatedFields = {
+        title: updateData.title || "",
+        time: updateData.time || "",
+        price: updateData.price || "",
+      };
+
+      const response = await fetch(`${API_URL}/service/${updateData._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedFields),
+      });
+
+      const data = await response.json();
+      if (data.service) {
+        setServices(
+          services.map((service) =>
+            service._id === data.service._id ? data.service : service
+          )
+        );
+      }
+      setIsUpdateModalOpen(false);
+    } catch (err) {
+      console.error("Error updating service:", err);
+    } finally {
+      setIsLoading(false); // Stop loading
+    }
   };
 
   // Delete service
-  const handleDeleteService = (id) => {
+   // Delete service
+   const handleDeleteService = async (id) => {
     // Confirmation before deletion
     const confirmDelete = window.confirm("Are you sure you want to delete this service?");
     if (!confirmDelete) return;
 
-    fetch(`${API_URL}/service/${id}`, {
-      method: 'DELETE',
-    })
-      .then((response) => {
-        if (response.ok) {
-          const updatedServices = services.filter((service) => service._id !== id);
-          setServices(updatedServices);
+    setIsLoading(true); // Start loading
 
-          // Adjust pagination if needed
-          const totalPages = Math.ceil(updatedServices.length / servicesPerPage);
-          if (currentPage > totalPages && totalPages > 0) {
-            setCurrentPage(totalPages);
-          }
+    try {
+      const response = await fetch(`${API_URL}/service/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        const updatedServices = services.filter((service) => service._id !== id);
+        setServices(updatedServices);
+
+        // Adjust pagination if needed
+        const totalPages = Math.ceil(updatedServices.length / servicesPerPage);
+        if (currentPage > totalPages && totalPages > 0) {
+          setCurrentPage(totalPages);
         }
-      })
-      .catch((err) => console.error("Error deleting service:", err));
+      }
+    } catch (err) {
+      console.error("Error deleting service:", err);
+    } finally {
+      setIsLoading(false); // Stop loading
+    }
   };
 
   // Handle assigning service
@@ -154,22 +181,28 @@ const Services = () => {
   };
 
   // Save assigned professionals for a service
-  const handleSaveAssignments = () => {
-    fetch(`${API_URL}/service/${currentServiceId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ assignedProfessionals: selectedProfessionals }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.service) {
-          setServices(
-            services.map((service) => (service._id === data.service._id ? data.service : service))
-          );
-        }
-        setIsAssignModalOpen(false);
-      })
-      .catch((err) => console.error("Error saving assignments:", err));
+  const handleSaveAssignments = async () => {
+    setIsLoading(true); // Start loading
+
+    try {
+      const response = await fetch(`${API_URL}/service/${currentServiceId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assignedProfessionals: selectedProfessionals }),
+      });
+
+      const data = await response.json();
+      if (data.service) {
+        setServices(
+          services.map((service) => (service._id === data.service._id ? data.service : service))
+        );
+      }
+      setIsAssignModalOpen(false);
+    } catch (err) {
+      console.error("Error saving assignments:", err);
+    } finally {
+      setIsLoading(false); // Stop loading
+    }
   };
 
   // Toggle professional selection
@@ -280,6 +313,15 @@ const Services = () => {
         </table>
       </div>
 
+      {/* Loader while saving or updating */}
+      {isLoading && (
+        <div className="relative flex flex-col w-full h-full text-gray-700 bg-white shadow-md rounded-lg bg-clip-border overflow-hidden">
+          <div className="flex justify-center items-center h-48">
+            <ReactLoading type="spin" color="#4B2E2E" />
+          </div>
+        </div>
+      )}
+
       {/* Pagination Controls */}
       <div className="flex justify-center items-center mt-4">
         <button
@@ -304,7 +346,6 @@ const Services = () => {
           <AiOutlineRight />
         </button>
       </div>
-
       {/* Modal for Assigning Professionals */}
       {isAssignModalOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
@@ -345,81 +386,81 @@ const Services = () => {
       )}
 
       {/* Modal for Updating/Adding Service */}
-{isUpdateModalOpen && (
-  <div
-    className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="modal-title"
-  >
-    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-      <h2 id="modal-title" className="text-xl font-semibold mb-4">
-        {updateData ? 'Update Service' : 'Add Service'}
-      </h2>
-      <form onSubmit={updateData ? handleUpdateService : handleAddService}>
-        <div className="mb-4">
-          <label className="block text-sm font-medium">Title</label>
-          <input
-            type="text"
-            className="w-full p-2 border border-gray-300 rounded"
-            value={updateData ? updateData.title : formData.title}
-            onChange={(e) => 
-              updateData 
-                ? setUpdateData({ ...updateData, title: e.target.value })
-                : setFormData({ ...formData, title: e.target.value })
-            }
-            required
-          />
+      {isUpdateModalOpen && (
+        <div
+          className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 id="modal-title" className="text-xl font-semibold mb-4">
+              {updateData ? 'Update Service' : 'Add Service'}
+            </h2>
+            <form onSubmit={updateData ? handleUpdateService : handleAddService}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Title</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border border-gray-300 rounded"
+                  value={updateData ? updateData.title : formData.title}
+                  onChange={(e) => 
+                    updateData 
+                      ? setUpdateData({ ...updateData, title: e.target.value })
+                      : setFormData({ ...formData, title: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Time</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border border-gray-300 rounded"
+                  value={updateData ? updateData.time : formData.time}
+                  onChange={(e) => 
+                    updateData 
+                      ? setUpdateData({ ...updateData, time: e.target.value })
+                      : setFormData({ ...formData, time: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Price</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border border-gray-300 rounded"
+                  value={updateData ? updateData.price : formData.price}
+                  onChange={(e) => 
+                    updateData 
+                      ? setUpdateData({ ...updateData, price: e.target.value })
+                      : setFormData({ ...formData, price: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsUpdateModalOpen(false)}
+                  className="relative font-montserrat inline-flex items-center justify-center rounded-[10px] overflow-hidden tracking-tighter group border sm:place-self-center lg:place-self-start border-brown-primary text-[14px] sm:text-[16px] px-4 sm:w-60 md:w-72 h-12 bg-gray-500 text-white hover:bg-gray-600 hover:shadow-lg !shadow-brown-primary hover:text-white hover-styling"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="relative font-montserrat inline-flex items-center justify-center rounded-[10px] overflow-hidden tracking-tighter group border sm:place-self-center lg:place-self-start border-brown-primary text-[14px] sm:text-[16px] px-4 sm:w-60 md:w-72 h-12 bg-white text-brown-primary hover:bg-[#4B2E2E] hover:shadow-lg !shadow-brown-primary hover:text-white hover-styling"
+                >
+                  {updateData ? 'Update' : 'Add'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium">Time</label>
-          <input
-            type="text"
-            className="w-full p-2 border border-gray-300 rounded"
-            value={updateData ? updateData.time : formData.time}
-            onChange={(e) => 
-              updateData 
-                ? setUpdateData({ ...updateData, time: e.target.value })
-                : setFormData({ ...formData, time: e.target.value })
-            }
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium">Price</label>
-          <input
-            type="text"
-            className="w-full p-2 border border-gray-300 rounded"
-            value={updateData ? updateData.price : formData.price}
-            onChange={(e) => 
-              updateData 
-                ? setUpdateData({ ...updateData, price: e.target.value })
-                : setFormData({ ...formData, price: e.target.value })
-            }
-            required
-          />
-        </div>
-        <div className="flex justify-end gap-2 mt-4">
-          {/* Apply the previous button styling here */}
-          <button
-            type="button"
-            onClick={() => setIsUpdateModalOpen(false)}
-            className="relative font-montserrat inline-flex items-center justify-center rounded-[10px] overflow-hidden tracking-tighter group border sm:place-self-center lg:place-self-start border-brown-primary text-[14px] sm:text-[16px] px-4 sm:w-60 md:w-72 h-12 bg-white text-brown-primary hover:bg-[#4B2E2E] hover:shadow-lg !shadow-brown-primary hover:text-white hover-styling"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="relative font-montserrat inline-flex items-center justify-center rounded-[10px] overflow-hidden tracking-tighter group border sm:place-self-center lg:place-self-start border-brown-primary text-[14px] sm:text-[16px] px-4 sm:w-60 md:w-72 h-12 bg-white text-brown-primary hover:bg-[#4B2E2E] hover:shadow-lg !shadow-brown-primary hover:text-white hover-styling"
-          >
-            {updateData ? 'Update' : 'Add'}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
+      )}
 
+      <ToastContainer />
     </div>
   );
 };
