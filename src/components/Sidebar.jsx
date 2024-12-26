@@ -5,7 +5,7 @@ function Sidebar() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex min-h-full bg-gray-100">
       {/* Toggle Button for Mobile */}
       <button
         className="absolute top-4 left-4 z-50 md:hidden px-4 py-2 bg-[#4B2E2E] text-white rounded-lg shadow-md transition-all duration-300 hover:bg-brown-primary"
