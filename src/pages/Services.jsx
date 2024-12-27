@@ -19,7 +19,7 @@ const Services = () => {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const servicesPerPage = 7;
+  const servicesPerPage = 20;
 
   // Fetch services and professionals on component mount
   useEffect(() => {

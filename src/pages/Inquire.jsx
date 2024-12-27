@@ -17,7 +17,7 @@ const Inquire = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [editingInquiryId, setEditingInquiryId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 7;
+  const itemsPerPage = 20;
 
   useEffect(() => {
     const fetchData = async () => {

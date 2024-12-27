@@ -226,7 +226,7 @@ import axios from 'axios';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import ReactLoading from 'react-loading';
 
-const API_URL = "https://hotrodsbackend.onrender.com"; // Base API URL
+const API_URL = "https://hotrodsbackend.onrender.com";
 
 const AuthorizeDisplay = () => {
   const [authorizations, setAuthorizations] = useState([]);
@@ -234,14 +234,18 @@ const AuthorizeDisplay = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 20;
 
   useEffect(() => {
     const fetchAuthorizations = async () => {
       setIsLoading(true);
       try {
         const response = await axios.get(`${API_URL}/pay`);
-        setAuthorizations(response.data);
+        // Sort the data by date in descending order (most recent first)
+        const sortedData = response.data.sort((a, b) => {
+          return new Date(b.date) - new Date(a.date);
+        });
+        setAuthorizations(sortedData);
       } catch (err) {
         console.error('Error fetching authorizations:', err);
         setError('Failed to fetch authorization records. Please try again later.');
@@ -320,10 +324,6 @@ const AuthorizeDisplay = () => {
                 <p className="text-gray-600">Subtotal</p>
                 <p className="font-medium">${selectedRecord.subTotal}</p>
               </div>
-              {/* <div>
-                <p className="text-gray-600">Tip</p>
-                <p className="font-medium">${selectedRecord.tip || 0}</p>
-              </div> */}
               <div>
                 <p className="text-gray-600">Grand Total</p>
                 <p className="font-medium">${selectedRecord.grandTotal}</p>

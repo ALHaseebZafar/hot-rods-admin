@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AiFillEdit, AiFillDelete } from "react-icons/ai";
+import { AiFillEdit, AiFillDelete, AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ReactLoading from "react-loading";
@@ -18,6 +18,8 @@ const Professionals = () => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isImageUploading, setIsImageUploading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 20;
   const API_URL = "https://hotrodsbackend.onrender.com";
 
   useEffect(() => {
@@ -194,6 +196,12 @@ const Professionals = () => {
     setUpdateData(null);
     setIsUpdateModalOpen(false);
   };
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const totalPages = Math.ceil(professionals.length / itemsPerPage);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+const currentItems = professionals.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <div className="p-4 w-full">
@@ -228,7 +236,7 @@ const Professionals = () => {
                 </tr>
               </thead>
               <tbody>
-                {professionals.map((professional) => (
+                {currentItems.map((professional) => (
                   <tr key={professional._id} className="hover:bg-slate-50">
                     <td className="p-4 border-b border-slate-200 flex items-center">
                       <img
@@ -279,6 +287,30 @@ const Professionals = () => {
           </div>
         )}
       </div>
+       {/* Only show pagination if there are professionals */}
+       {professionals.length > 0 && (
+        <div className="flex justify-center items-center mt-4 space-x-2">
+          <button 
+            onClick={() => paginate(currentPage - 1)} 
+            disabled={currentPage === 1}
+            className="p-2 rounded bg-gray-200 disabled:opacity-50"
+          >
+            <AiOutlineLeft />
+          </button>
+          
+          <span className="text-sm text-gray-700">
+            Page {currentPage} of {totalPages}
+          </span>
+          
+          <button 
+            onClick={() => paginate(currentPage + 1)} 
+            disabled={currentPage === totalPages}
+            className="p-2 rounded bg-gray-200 disabled:opacity-50"
+          >
+            <AiOutlineRight />
+          </button>
+        </div>
+      )}
 
       {isUpdateModalOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">

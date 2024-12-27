@@ -8,7 +8,7 @@ const ContactUs = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 7;
+  const itemsPerPage = 20;
 
   // Get the backend URL from environment variables
   const API_URL = "https://hotrodsbackend.onrender.com"; 
