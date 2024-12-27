@@ -225,6 +225,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
 import ReactLoading from 'react-loading';
+import { useLocation } from 'react-router-dom';
 
 const API_URL = "https://hotrodsbackend.onrender.com";
 
@@ -235,6 +236,8 @@ const AuthorizeDisplay = () => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+  const location = useLocation();
+
 
   useEffect(() => {
     const fetchAuthorizations = async () => {
@@ -256,6 +259,14 @@ const AuthorizeDisplay = () => {
 
     fetchAuthorizations();
   }, []);
+
+   // Reset selectedRecord when navigating back to "/ordersummary"
+   useEffect(() => {
+    if (location.pathname === '/ordersummary') {
+      setSelectedRecord(null);
+      setCurrentPage(1); // Reset pagination to page 1
+    }
+  }, [location]);
 
   const handleViewDetails = (record) => {
     setSelectedRecord(record);

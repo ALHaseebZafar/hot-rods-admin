@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Sidebar() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+
+  // Generalized navigation handler for all routes
+  const handleNavigation = (path) => {
+    navigate(path, { replace: true }); // Reset the route for all links
+    setSidebarOpen(false); // Close the sidebar after navigation
+  };
 
   return (
     <div className="flex min-h-full bg-gray-100">
@@ -31,20 +38,17 @@ function Sidebar() {
                 { path: '/professionals', label: 'Professional' },
                 { path: '/inquiry', label: 'Online/Manual Booking' },
                 { path: '/services', label: 'Services' },
-                // { path: '/appointments', label: 'Appointment' },
                 { path: '/ordersummary', label: 'Order Summary' },
                 { path: '/contactus', label: 'Contact Us' },
                 { path: '/shoptiming', label: 'Shop Timing' },
               ].map((link, index) => (
-                <Link
+                <button
                   key={index}
-                  to={link.path}
-                  className="w-full hover:bg-[#6A4C4C] transition-all duration-300 rounded-lg"
+                  onClick={() => handleNavigation(link.path)}
+                  className="w-full text-gray-100 px-4 py-2 text-left font-montserrat tracking-tight hover:bg-[#6A4C4C] transition-all duration-300 rounded-lg"
                 >
-                  <button className="w-full text-gray-100 px-4 py-2 text-left font-montserrat tracking-tight">
-                    {link.label}
-                  </button>
-                </Link>
+                  {link.label}
+                </button>
               ))}
             </nav>
           </div>
