@@ -19,26 +19,6 @@ const Inquire = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [professionalsResponse, inquiriesResponse] = await Promise.all([
-          axios.get(`${API_URL}/professional`),
-          axios.get(`${API_URL}/inquire`)
-        ]);
-        setProfessionals(professionalsResponse.data.professionals || []);
-        setSubmittedData(inquiriesResponse.data.inquires || []);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        toast.error(error.response?.data?.message || "Failed to fetch data");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
   const resetForm = () => {
     setSelectedProfessional(null);
     setBookingDetails({ date: "", startTime: "", endTime: "" });
