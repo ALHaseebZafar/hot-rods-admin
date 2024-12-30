@@ -3,28 +3,37 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { AiOutlineLeft, AiOutlineRight } from 'react-icons/ai';
-import ReactLoading from "react-loading";
+import ReactLoading from 'react-loading';
 import 'react-toastify/dist/ReactToastify.css';
 
-const API_URL = "https://hotrodsbackend.onrender.com";
+const API_URL = 'https://hotrodsbackend.onrender.com';
 
 const Inquire = () => {
   const [professionals, setProfessionals] = useState([]);
   const [selectedProfessional, setSelectedProfessional] = useState(null);
-  const [bookingDetails, setBookingDetails] = useState({ date: "", startTime: "", endTime: "" });
+  const [bookingDetails, setBookingDetails] = useState({
+    date: '',
+    startTime: '',
+    endTime: ''
+  });
   const [submittedData, setSubmittedData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [editingInquiryId, setEditingInquiryId] = useState(null);
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
+  // Reset form fields
   const resetForm = () => {
     setSelectedProfessional(null);
-    setBookingDetails({ date: "", startTime: "", endTime: "" });
+    setBookingDetails({ date: '', startTime: '', endTime: '' });
     setEditingInquiryId(null);
   };
 
+  // -----------------------------
+  // Handle submission (create or edit)
+  // -----------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedProfessional) {
@@ -36,67 +45,85 @@ const Inquire = () => {
 
     try {
       if (editingInquiryId) {
-        // For updating existing booking
+        // -----------------------------
+        // Updating existing booking
+        // -----------------------------
         const response = await axios.patch(
-          `${API_URL}/inquire/${selectedProfessional}`,
+          `${API_URL}/inquire/${selectedProfessional}`, // Using professionalId
           {
-            manualBookingDetails: [{
-              date: bookingDetails.date,
-              startTime: bookingDetails.startTime,
-              endTime: bookingDetails.endTime
-            }]
+            // We only pass manualBookingDetails here for demonstration;
+            // add onlineBookingDetails if you need to update those too.
+            manualBookingDetails: [
+              {
+                date: bookingDetails.date,
+                startTime: bookingDetails.startTime,
+                endTime: bookingDetails.endTime
+              }
+            ]
           }
         );
 
-        // Get the professional details
-        const professionalDetails = professionals.find(p => p._id === selectedProfessional);
+        // Find the professional details to keep them populated in local state
+        const professionalDetails = professionals.find(
+          (p) => p._id === selectedProfessional
+        );
 
-        // Create updated inquiry with populated professional
+        // Merge updated inquiry with the professional’s data (front-end only)
         const updatedInquiry = {
           ...response.data.inquire,
-          professional: professionalDetails // Ensure professional details are maintained
+          professional: professionalDetails
         };
 
-        // Update the local state while preserving professional details
-        const updatedInquiries = submittedData.map(inquiry =>
+        // Replace the old inquiry in state by matching _id
+        const updatedInquiries = submittedData.map((inquiry) =>
           inquiry._id === editingInquiryId ? updatedInquiry : inquiry
         );
 
         setSubmittedData(updatedInquiries);
-        toast.success("Booking updated successfully!");
+        toast.success('Booking updated successfully!');
       } else {
-        // For creating new booking
+        // -----------------------------
+        // Creating a new booking
+        // -----------------------------
         const response = await axios.post(`${API_URL}/inquire`, {
           professional: selectedProfessional,
-          manualBookingDetails: [{
-            date: bookingDetails.date,
-            startTime: bookingDetails.startTime,
-            endTime: bookingDetails.endTime
-          }]
+          manualBookingDetails: [
+            {
+              date: bookingDetails.date,
+              startTime: bookingDetails.startTime,
+              endTime: bookingDetails.endTime
+            }
+          ]
         });
 
-        // Ensure the professional is populated in the new inquiry
-        const professionalDetails = professionals.find(p => p._id === selectedProfessional);
+        // Populate the professional in the newly created inquiry
+        const professionalDetails = professionals.find(
+          (p) => p._id === selectedProfessional
+        );
         const newInquiry = {
           ...response.data.inquire,
-          professional: professionalDetails,
+          professional: professionalDetails
         };
 
         setSubmittedData([newInquiry, ...submittedData]);
-        toast.success("Booking submitted successfully!");
+        toast.success('Booking submitted successfully!');
       }
 
       setIsFormVisible(false);
       resetForm();
     } catch (error) {
-      console.error("Submission error:", error);
-      toast.error(error.response?.data?.message || "Failed to submit/update booking");
+      console.error('Submission error:', error);
+      toast.error(
+        error.response?.data?.message || 'Failed to submit/update booking'
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  // Add a refetch function to handle data refresh
+  // -----------------------------
+  // Refetch professionals & inquiries
+  // -----------------------------
   const refetchData = async () => {
     try {
       setLoading(true);
@@ -108,36 +135,48 @@ const Inquire = () => {
       setSubmittedData(inquiriesResponse.data.inquires || []);
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error(error.response?.data?.message || "Failed to fetch data");
+      toast.error(error.response?.data?.message || 'Failed to fetch data');
     } finally {
       setLoading(false);
     }
   };
 
-  // Modify useEffect to use refetchData
   useEffect(() => {
     refetchData();
   }, []);
-  
-  // Update handleEdit function to properly set the form data
+
+  // -----------------------------
+  // Edit an existing booking
+  // -----------------------------
   const handleEdit = (index) => {
     const dataToEdit = submittedData[index];
-    if (!dataToEdit?.professional?._id || !dataToEdit?.manualBookingDetails?.[0]) {
+    if (
+      !dataToEdit?.professional?._id ||
+      !dataToEdit?.manualBookingDetails?.[0]
+    ) {
       toast.error('Invalid booking data');
       return;
     }
 
+    // Extract the first booking detail from the array
     const bookingDetail = dataToEdit.manualBookingDetails[0];
+
     setSelectedProfessional(dataToEdit.professional._id);
     setBookingDetails({
       date: bookingDetail.date,
       startTime: bookingDetail.startTime,
       endTime: bookingDetail.endTime
     });
+
+    // Keep track of which inquiry we’re editing by ID (not used in the backend, but for local state)
     setEditingInquiryId(dataToEdit._id);
+
     setIsFormVisible(true);
   };
 
+  // -----------------------------
+  // Delete a booking
+  // -----------------------------
   const handleDelete = async (index) => {
     try {
       const inquiryToDelete = submittedData[index];
@@ -155,12 +194,18 @@ const Inquire = () => {
     }
   };
 
+  // -----------------------------
+  // Pagination
+  // -----------------------------
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = submittedData.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(submittedData.length / itemsPerPage);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  // -----------------------------
+  // Show loading spinner
+  // -----------------------------
   if (loading && !isFormVisible) {
     return (
       <div className="flex justify-center items-center h-48">
@@ -172,6 +217,8 @@ const Inquire = () => {
   return (
     <div className="p-4 w-full">
       <h1 className="text-xl font-semibold mb-4">Manual Booking</h1>
+
+      {/* Add Booking Button */}
       <button
         onClick={() => {
           setIsFormVisible(true);
@@ -183,8 +230,9 @@ const Inquire = () => {
         Add Booking
       </button>
 
+      {/* Booking Form */}
       {isFormVisible && (
-        <form onSubmit={handleSubmit} className="mb-4">
+        <form onSubmit={handleSubmit} className="mb-4 mt-4">
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">
               Select Professional
@@ -204,37 +252,61 @@ const Inquire = () => {
             </select>
           </div>
 
+          {/* Date */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Date</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Date
+            </label>
             <input
               type="date"
               value={bookingDetails.date}
-              onChange={(e) => setBookingDetails({...bookingDetails, date: e.target.value})}
-              className="mt-1 p-2 w-full border border-gray-300 rounded"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Start Time</label>
-            <input
-              type="time"
-              value={bookingDetails.startTime}
-              onChange={(e) => setBookingDetails({...bookingDetails, startTime: e.target.value})}
-              className="mt-1 p-2 w-full border border-gray-300 rounded"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">End Time</label>
-            <input
-              type="time"
-              value={bookingDetails.endTime}
-              onChange={(e) => setBookingDetails({...bookingDetails, endTime: e.target.value})}
+              onChange={(e) =>
+                setBookingDetails({ ...bookingDetails, date: e.target.value })
+              }
               className="mt-1 p-2 w-full border border-gray-300 rounded"
               required
             />
           </div>
 
+          {/* Start Time */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">
+              Start Time
+            </label>
+            <input
+              type="time"
+              value={bookingDetails.startTime}
+              onChange={(e) =>
+                setBookingDetails({
+                  ...bookingDetails,
+                  startTime: e.target.value
+                })
+              }
+              className="mt-1 p-2 w-full border border-gray-300 rounded"
+              required
+            />
+          </div>
+
+          {/* End Time */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">
+              End Time
+            </label>
+            <input
+              type="time"
+              value={bookingDetails.endTime}
+              onChange={(e) =>
+                setBookingDetails({
+                  ...bookingDetails,
+                  endTime: e.target.value
+                })
+              }
+              className="mt-1 p-2 w-full border border-gray-300 rounded"
+              required
+            />
+          </div>
+
+          {/* Submit & Cancel Buttons */}
           <div className="flex space-x-2">
             <button
               type="submit"
@@ -252,8 +324,10 @@ const Inquire = () => {
                     className="ml-2"
                   />
                 </span>
+              ) : editingInquiryId ? (
+                'Update'
               ) : (
-                editingInquiryId ? 'Update' : 'Submit'
+                'Submit'
               )}
             </button>
             <button
@@ -271,6 +345,7 @@ const Inquire = () => {
         </form>
       )}
 
+      {/* Bookings Table */}
       {!isFormVisible && (
         <div className="mt-4">
           <h2 className="text-xl font-semibold">Submitted Bookings</h2>
@@ -288,15 +363,23 @@ const Inquire = () => {
                 {currentItems.length > 0 ? (
                   currentItems.map((booking, index) => (
                     <tr key={booking._id || index}>
+                      {/* Professional Name */}
                       <td className="border px-4 py-2">
                         {booking.professional?.name || 'N/A'}
                       </td>
+
+                      {/* Date */}
                       <td className="border px-4 py-2">
                         {booking.manualBookingDetails?.[0]?.date || 'N/A'}
                       </td>
+
+                      {/* Start to End Time */}
                       <td className="border px-4 py-2">
-                        {`${booking.manualBookingDetails?.[0]?.startTime || 'N/A'} to ${booking.manualBookingDetails?.[0]?.endTime || 'N/A'}`}
+                        {`${booking.manualBookingDetails?.[0]?.startTime || 'N/A'}
+                        to
+                        ${booking.manualBookingDetails?.[0]?.endTime || 'N/A'}`}
                       </td>
+
                       <td className="border px-4 py-2 flex space-x-2 justify-center">
                         <button
                           onClick={() => handleEdit(indexOfFirstItem + index)}
@@ -324,6 +407,7 @@ const Inquire = () => {
             </table>
           </div>
 
+          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-4 space-x-4">
               <button
