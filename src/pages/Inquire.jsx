@@ -45,7 +45,6 @@ const Inquire = () => {
     setEditingInquiryId(null);
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedProfessional) {
@@ -139,6 +138,7 @@ const Inquire = () => {
   useEffect(() => {
     refetchData();
   }, []);
+  
   // Update handleEdit function to properly set the form data
   const handleEdit = (index) => {
     const dataToEdit = submittedData[index];
