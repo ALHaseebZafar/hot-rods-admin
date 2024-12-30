@@ -45,6 +45,7 @@ const Inquire = () => {
     setEditingInquiryId(null);
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedProfessional) {
@@ -55,37 +56,54 @@ const Inquire = () => {
     setLoading(true);
 
     try {
-      const selectedProfessionalObj = professionals.find(p => p._id === selectedProfessional);
-      
-      if (!selectedProfessionalObj) {
-        throw new Error('Selected professional not found');
-      }
-
-      const inquireData = {
-        professional: selectedProfessionalObj,
-        manualBooking: true,
-        manualBookingDetails: bookingDetails,
-        checkedByAdmin: false,
-      };
-
       if (editingInquiryId) {
-        const response = await axios.patch(`${API_URL}/inquire/${editingInquiryId}`, inquireData);
-        const updatedInquiries = submittedData.map(inquiry =>
-          inquiry._id === editingInquiryId
-            ? { ...response.data.inquire, professional: selectedProfessionalObj }
-            : inquiry
+        // For updating existing booking
+        const response = await axios.patch(
+          `${API_URL}/inquire/${selectedProfessional}`,
+          {
+            manualBookingDetails: [{
+              date: bookingDetails.date,
+              startTime: bookingDetails.startTime,
+              endTime: bookingDetails.endTime
+            }]
+          }
         );
+
+        // Get the professional details
+        const professionalDetails = professionals.find(p => p._id === selectedProfessional);
+
+        // Create updated inquiry with populated professional
+        const updatedInquiry = {
+          ...response.data.inquire,
+          professional: professionalDetails // Ensure professional details are maintained
+        };
+
+        // Update the local state while preserving professional details
+        const updatedInquiries = submittedData.map(inquiry =>
+          inquiry._id === editingInquiryId ? updatedInquiry : inquiry
+        );
+
         setSubmittedData(updatedInquiries);
         toast.success("Booking updated successfully!");
       } else {
-        const response = await axios.post(`${API_URL}/inquire`, inquireData);
-        setSubmittedData([
-          {
-            ...response.data.inquire,
-            professional: selectedProfessionalObj
-          },
-          ...submittedData
-        ]);
+        // For creating new booking
+        const response = await axios.post(`${API_URL}/inquire`, {
+          professional: selectedProfessional,
+          manualBookingDetails: [{
+            date: bookingDetails.date,
+            startTime: bookingDetails.startTime,
+            endTime: bookingDetails.endTime
+          }]
+        });
+
+        // Ensure the professional is populated in the new inquiry
+        const professionalDetails = professionals.find(p => p._id === selectedProfessional);
+        const newInquiry = {
+          ...response.data.inquire,
+          professional: professionalDetails,
+        };
+
+        setSubmittedData([newInquiry, ...submittedData]);
         toast.success("Booking submitted successfully!");
       }
 
@@ -99,15 +117,43 @@ const Inquire = () => {
     }
   };
 
+  // Add a refetch function to handle data refresh
+  const refetchData = async () => {
+    try {
+      setLoading(true);
+      const [professionalsResponse, inquiriesResponse] = await Promise.all([
+        axios.get(`${API_URL}/professional`),
+        axios.get(`${API_URL}/inquire`)
+      ]);
+      setProfessionals(professionalsResponse.data.professionals || []);
+      setSubmittedData(inquiriesResponse.data.inquires || []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error(error.response?.data?.message || "Failed to fetch data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Modify useEffect to use refetchData
+  useEffect(() => {
+    refetchData();
+  }, []);
+  // Update handleEdit function to properly set the form data
   const handleEdit = (index) => {
     const dataToEdit = submittedData[index];
-    if (!dataToEdit || !dataToEdit.professional) {
+    if (!dataToEdit?.professional?._id || !dataToEdit?.manualBookingDetails?.[0]) {
       toast.error('Invalid booking data');
       return;
     }
 
+    const bookingDetail = dataToEdit.manualBookingDetails[0];
     setSelectedProfessional(dataToEdit.professional._id);
-    setBookingDetails(dataToEdit.manualBookingDetails || { date: "", startTime: "", endTime: "" });
+    setBookingDetails({
+      date: bookingDetail.date,
+      startTime: bookingDetail.startTime,
+      endTime: bookingDetail.endTime
+    });
     setEditingInquiryId(dataToEdit._id);
     setIsFormVisible(true);
   };
@@ -266,10 +312,10 @@ const Inquire = () => {
                         {booking.professional?.name || 'N/A'}
                       </td>
                       <td className="border px-4 py-2">
-                        {booking.manualBookingDetails?.date || 'N/A'}
+                        {booking.manualBookingDetails?.[0]?.date || 'N/A'}
                       </td>
                       <td className="border px-4 py-2">
-                        {`${booking.manualBookingDetails?.startTime || 'N/A'} to ${booking.manualBookingDetails?.endTime || 'N/A'}`}
+                        {`${booking.manualBookingDetails?.[0]?.startTime || 'N/A'} to ${booking.manualBookingDetails?.[0]?.endTime || 'N/A'}`}
                       </td>
                       <td className="border px-4 py-2 flex space-x-2 justify-center">
                         <button
@@ -319,7 +365,7 @@ const Inquire = () => {
               >
                 <AiOutlineRight className="w-5 h-5" />
               </button>
-              </div>
+            </div>
           )}
         </div>
       )}
